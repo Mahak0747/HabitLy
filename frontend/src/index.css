@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  @apply font-body bg-ink-50 text-ink-900 dark:bg-ink-950 dark:text-ink-50 transition-colors duration-300;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Sora", system-ui, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Thin, unobtrusive scrollbars used inside the matrix and kanban columns */
+.thin-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(108, 99, 242, 0.35);
+  border-radius: 999px;
+}
+.dark .thin-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(140, 130, 255, 0.35);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
