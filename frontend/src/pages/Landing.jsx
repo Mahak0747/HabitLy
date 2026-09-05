@@ -301,7 +301,7 @@ const Landing = () => {
             </div>
             <span className="font-display font-semibold">Habitly</span>
           </div>
-          <p className="text-xs text-ink-900/40 dark:text-ink-50/40">© {new Date().getFullYear()} Habitly. Built as a demo project.</p>
+          <p className="text-xs text-ink-900/40 dark:text-ink-50/40">© {new Date().getFullYear()} Habitly. All Rights Reserved.</p>
         </div>
       </footer>
     </div>
