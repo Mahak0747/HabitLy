@@ -80,4 +80,51 @@ router.put("/theme", protect, async (req, res) => {
   }
 });
 
+// Change password for the authenticated user. Requires the current password
+// to be re-verified server-side (never trust the client), enforces the same
+// minimum-length rule used at signup, and re-signs a fresh token afterwards
+// so the session the user is still using keeps working without forcing a
+// re-login, while any other/stale tokens naturally expire on their own.
+router.put("/change-password", protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      return res.status(400).json({ message: "Please fill in all fields" });
+    }
+    if (typeof newPassword !== "string" || newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+    if (newPassword.length > 128) {
+      return res.status(400).json({ message: "New password is too long (128 characters max)" });
+    }
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: "New passwords do not match" });
+    }
+
+    // req.user came from `.select("-password")` in the auth middleware, so
+    // re-fetch with the password field to verify the current password.
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) return res.status(401).json({ message: "User no longer exists" });
+
+    const match = await user.comparePassword(currentPassword);
+    if (!match) return res.status(401).json({ message: "Current password is incorrect" });
+
+    const samePassword = await user.comparePassword(newPassword);
+    if (samePassword) {
+      return res.status(400).json({ message: "New password must be different from the current password" });
+    }
+
+    user.password = newPassword; // hashed automatically by the pre("save") hook
+    await user.save();
+
+    // Issue a fresh token so the session that just changed the password
+    // keeps working seamlessly.
+    const token = signToken(user._id);
+    res.json({ message: "Password changed successfully", token, user: user.toSafeObject() });
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
 export default router;

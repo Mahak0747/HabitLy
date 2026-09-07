@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Already have a valid session (e.g. opened /login directly, or via
+  // back/forward navigation) — go straight to the dashboard instead of
+  // showing the login form again.
+  if (!authLoading && isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault();

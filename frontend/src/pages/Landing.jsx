@@ -6,6 +6,7 @@ import {
   BookOpen, Menu, X, ArrowRight, Moon, Sun, Sparkles,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const nav = [
   { label: "Features", href: "#features" },
@@ -42,43 +43,52 @@ const ThemeToggleButton = ({ className = "" }) => {
   );
 };
 
-const Navbar = ({ onMenu }) => (
-  <header className="sticky top-0 z-40 backdrop-blur-md bg-ink-50/80 dark:bg-ink-950/80 border-b border-ink-900/5 dark:border-white/5">
-    <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-          <Flame size={17} className="text-white" strokeWidth={2.5} />
+const Navbar = ({ onMenu }) => {
+  const { isAuthenticated } = useAuth();
+  return (
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-ink-50/80 dark:bg-ink-950/80 border-b border-ink-900/5 dark:border-white/5">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
+            <Flame size={17} className="text-white" strokeWidth={2.5} />
+          </div>
+          <span className="font-display font-bold text-lg tracking-tight">Habitly</span>
         </div>
-        <span className="font-display font-bold text-lg tracking-tight">Habitly</span>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-ink-900/70 dark:text-ink-50/70">
+          {nav.map((n) => (
+            <a key={n.href} href={n.href} className="hover:text-brand-600 dark:hover:text-brand-300 transition-colors">
+              {n.label}
+            </a>
+          ))}
+        </nav>
+        <div className="hidden md:flex items-center gap-3">
+          <ThemeToggleButton />
+          {!isAuthenticated && (
+            <Link to="/login" className="text-sm font-medium px-4 py-2 rounded-full hover:bg-ink-900/5 dark:hover:bg-white/5 transition-colors">
+              Log in
+            </Link>
+          )}
+          <Link
+            to={isAuthenticated ? "/app" : "/register"}
+            className="text-sm font-semibold px-4 py-2 rounded-full bg-brand-500 text-white hover:bg-brand-600 transition-colors shadow-soft"
+          >
+            {isAuthenticated ? "Go to Dashboard" : "Get started free"}
+          </Link>
+        </div>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggleButton />
+          <button className="p-2" onClick={onMenu} aria-label="Toggle menu">
+            <Menu size={22} />
+          </button>
+        </div>
       </div>
-      <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-ink-900/70 dark:text-ink-50/70">
-        {nav.map((n) => (
-          <a key={n.href} href={n.href} className="hover:text-brand-600 dark:hover:text-brand-300 transition-colors">
-            {n.label}
-          </a>
-        ))}
-      </nav>
-      <div className="hidden md:flex items-center gap-3">
-        <ThemeToggleButton />
-        <Link to="/login" className="text-sm font-medium px-4 py-2 rounded-full hover:bg-ink-900/5 dark:hover:bg-white/5 transition-colors">
-          Log in
-        </Link>
-        <Link to="/register" className="text-sm font-semibold px-4 py-2 rounded-full bg-brand-500 text-white hover:bg-brand-600 transition-colors shadow-soft">
-          Get started free
-        </Link>
-      </div>
-      <div className="flex items-center gap-1 md:hidden">
-        <ThemeToggleButton />
-        <button className="p-2" onClick={onMenu} aria-label="Toggle menu">
-          <Menu size={22} />
-        </button>
-      </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 const MobileMenu = ({ open, onClose }) => {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
   return (
     <div
       className={`fixed inset-0 z-50 md:hidden transition ${open ? "pointer-events-auto" : "pointer-events-none"}`}
@@ -111,13 +121,13 @@ const MobileMenu = ({ open, onClose }) => {
             <span className="text-xs font-semibold text-ink-900/40 dark:text-ink-50/40 capitalize">{theme}</span>
           </button>
           <hr className="border-ink-900/10 dark:border-white/10" />
-          <Link to="/login" onClick={onClose}>Log in</Link>
+          {!isAuthenticated && <Link to="/login" onClick={onClose}>Log in</Link>}
           <Link
-            to="/register"
+            to={isAuthenticated ? "/app" : "/register"}
             onClick={onClose}
             className="text-center px-4 py-3 rounded-full bg-brand-500 text-white font-semibold"
           >
-            Get started free
+            {isAuthenticated ? "Go to Dashboard" : "Get started free"}
           </Link>
         </div>
       </div>
@@ -165,6 +175,7 @@ const MiniMatrix = () => {
 
 const Landing = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-ink-50 dark:bg-ink-950 text-ink-900 dark:text-ink-50 overflow-x-hidden">
@@ -191,17 +202,19 @@ const Landing = () => {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                to="/register"
+                to={isAuthenticated ? "/app" : "/register"}
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 text-white font-semibold hover:bg-brand-600 transition-colors shadow-soft"
               >
-                Start tracking free <ArrowRight size={17} />
+                {isAuthenticated ? "Go to Dashboard" : "Start tracking free"} <ArrowRight size={17} />
               </Link>
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold border border-ink-900/10 dark:border-white/15 hover:bg-ink-900/5 dark:hover:bg-white/5 transition-colors"
-              >
-                I already have an account
-              </Link>
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold border border-ink-900/10 dark:border-white/15 hover:bg-ink-900/5 dark:hover:bg-white/5 transition-colors"
+                >
+                  I already have an account
+                </Link>
+              )}
             </div>
             <p className="mt-6 text-xs text-ink-900/40 dark:text-ink-50/40">No credit card. Your data stays yours, tied to your account only.</p>
           </motion.div>
@@ -285,10 +298,10 @@ const Landing = () => {
           <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-4">Start your first streak today</h2>
           <p className="text-ink-900/60 dark:text-ink-50/60 mb-8">It takes under a minute to add your first habit.</p>
           <Link
-            to="/register"
+            to={isAuthenticated ? "/app" : "/register"}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brand-500 text-white font-semibold hover:bg-brand-600 transition-colors shadow-soft"
           >
-            Create your free account <ArrowRight size={17} />
+            {isAuthenticated ? "Go to Dashboard" : "Create your free account"} <ArrowRight size={17} />
           </Link>
         </div>
       </section>

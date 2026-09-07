@@ -1,3 +1,4 @@
+dotenv.config();
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,8 +10,10 @@ import journalRoutes from "./routes/journal.js";
 import reminderRoutes from "./routes/reminders.js";
 import statsRoutes from "./routes/stats.js";
 import taskRoutes from "./routes/tasks.js";
+import dns from "dns";
 
-dotenv.config();
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 const app = express();
 
