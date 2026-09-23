@@ -10,6 +10,7 @@ import journalRoutes from "./routes/journal.js";
 import reminderRoutes from "./routes/reminders.js";
 import statsRoutes from "./routes/stats.js";
 import taskRoutes from "./routes/tasks.js";
+import calendarTaskRoutes from "./routes/calendarTasks.js";
 import dns from "dns";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
@@ -36,6 +37,7 @@ app.use("/api/journal", journalRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/calendar-tasks", calendarTaskRoutes);
 
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));
 
